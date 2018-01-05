@@ -544,7 +544,7 @@ $cornerSize: 50px;
 }
 
 @media screen and (min-width: 600px) {
-  .button i {
+  .ui-button i {
     margin-top: calc($cornerSize/2 - 36px/2);
   }
 }
