@@ -1,0 +1,29 @@
+{
+  "duration": 10,
+  "timeStep": 5,
+  "objects": [{
+    "name": "box1",
+    "type": "rect",
+    "scale": [50, 20],
+    "color": "blue"
+  },
+  {
+    "name": "box2",
+    "type": "rect",
+    "scale": [100, 100],
+    "color": "red"
+  }],
+  "frames": [{
+      "box1": [100, 100],
+      "box2": [500, 600]
+    },
+    {
+      "box1": [400, 100],
+      "box2": [400, 100]
+    },
+    {
+      "box1": [250, 100],
+      "box2": [100, 600]
+    }
+  ]
+}
