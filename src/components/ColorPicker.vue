@@ -13,7 +13,10 @@
         @keyup.enter="hidePicker()"></input>
     </span>
 
-    <span class="color-picker-preview-container">
+    <span
+      @mouseenter="showPicker()"
+      @mouseleave="hidePicker()"
+      class="color-picker-preview-container">
 
       <span
         class="current-color"
@@ -112,7 +115,7 @@ export default {
     colorValue(val) {
       if (val) {
         this.updateColors(val);
-        this.$emit('input', val);
+        this.$emit('change', val);
       }
     },
   },

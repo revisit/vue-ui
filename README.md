@@ -32,3 +32,34 @@ Dropzone:
 Validate JSON:
 - required settings
 - correct number of frames
+
+Convert objects to arrays and change key to a number
+
+Longer animation period (for multiple animations)
+- option to leave shorter animation at final value or just remove it
+
+TODO:
+- Need to refactor everything
+- Rollup? Tree-shaking? Remove unused CSS/JS/...
+
+Export animation file
+Export URL query
+
+Resize event listener
+
+```
+ready: function () {
+  window.addEventListener('resize', this.handleResize)
+},
+beforeDestroy: function () {
+  window.removeEventListener('resize', this.handleResize)
+}
+```
+
+Buttons across the top? Reset camera, etc.?
+
+
+https://gltf-rs.github.io/gltf-validator-web/?https://raw.githubusercontent.com/gltf-rs/gltf/master/gltf-json/tests/minimal_accessor_invalid.gltf
+
+
+Point and click on objects

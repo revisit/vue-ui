@@ -18,6 +18,8 @@
 
       <div class="settings z2">
 
+        <h5>Global Settings</h5>
+
         <div class="settings-item">
           <div class="settings-button-group">
             <input class="settings-button" type="button" name="reset-camera" id="reset-camera">
@@ -35,15 +37,28 @@
 
         <hr>
 
+        <h5>Model Settings</h5>
+
         <div class="settings-item" style="line-height: 1rem;">
           <treeselect
             v-if="optionsReady"
             placeholder="Select Object(s)..."
-            v-model="value"
+            v-model="selections"
             :multiple="true"
             :options="objectNames">
           </treeselect>
         </div>
+
+        <div class="settings-item">
+          <div class="settings-item-label"><label for="colorWell">Color</label></div>
+          <div class="settings-item-content">
+            <!-- <div style="overflow: hidden;"> -->
+            <colorpicker :color="currentColor" v-on:change="changeColor"></colorpicker>
+            <!-- </div> -->
+          </div>
+        </div>
+
+        <!-- list of built-in textures -->
 
         <div class="settings-item">
           <div class="toggle-switch-group">
@@ -54,13 +69,13 @@
         </div>
 
         <div class="settings-item">
-          <div class="settings-item-label"><label for="colorWell">Color</label></div>
-          <div class="settings-item-content">
-            <colorpicker :color="currentColor" v-model="currentColor"></colorpicker>
+          <div class="toggle-switch-group">
+            <input type="checkbox" name="visibility" id="visibility">
+            <label for="visibility" class="toggle-slider"></label>
+            <label for="visibility" class="settings-label">Show Model</label>
           </div>
         </div>
 
-        <!-- list of textures -->
 
 
       </div>
@@ -156,31 +171,49 @@ export default {
       displayDropzone: true,
 
       // Select input settings
-      value: null,
+      selections: [],
       objectNames: [],
       optionsReady: true,
     };
   },
   methods: {
+    changeColor(color) {
+      if (this.animation && this.selections.length > 0) {
+        this.selections.forEach((id) => { this.animation[0].objects[id].color = color; });
+      }
+    },
     handleDragOver(status) {
       this.displayDropzone = status || this.$refs.dropzone.isDragover || !this.animationAvailable;
     },
     dataReady(ad) {
       // eslint-disable-next-line
       console.log('parent', ad);
+
       this.animationAvailable = true;
       this.animation = ad;
       this.displayDropzone = false;
       this.isPlaying = false;
       this.speed = 1;
-      this.timeEnd = ad[0].duration;
+      this.timeEnd = this.animation[0].duration;
       this.time = 0;
       this.hideSettings();
-      this.updateObjects(ad);
+      this.updateObjects();
     },
-    updateObjects(ad) {
-      this.value = null;
-      this.objectNames = ad[0].objects.map(obj => ({ id: obj.name, label: obj.name }));
+    updateObjects() {
+      this.selections = [];
+
+      this.animation[0].objects.forEach((obj, idx) => {
+        this.objectNames.push({ id: idx, label: obj.name });
+      });
+
+      // // eslint-disable-next-line
+      // for (const [key, value] of Object.entries(this.animation[0].objects)) {
+      //   this.objectNames.push({ id: key, label: key });
+      // }
+
+      // eslint-disable-next-line
+      console.log(this.objectNames);
+
       this.optionsReady = false;
       this.$nextTick(() => { this.optionsReady = true; });
     },
@@ -196,7 +229,7 @@ export default {
       // eslint-disable-next-line
       // console.log(Treeselect);
 
-      this.value = null;
+      this.selections = [];
       this.objectNames.push({ id: 'new', label: 'New' });
       this.optionsReady = false;
       this.$nextTick(() => { this.optionsReady = true; });
@@ -242,7 +275,7 @@ export default {
       canvas.height = window.innerHeight;
 
       // eslint-disable-next-line
-      // console.log(self.selectedObject);
+      // console.log('animation', self.animation);
 
       // if (self.selectedObject) {
       //   self.scene[self.selectedObject].color = self.colors.hex;
@@ -258,6 +291,7 @@ export default {
       const frame1 = self.animation[0].frames[index];
       const frame2 = self.animation[0].frames[i2];
 
+      // eslint-disable-next-line
       self.animation[0].objects.forEach((obj) => {
         const w = obj.scale[0];
         const h = obj.scale[1];
@@ -332,6 +366,9 @@ $cornerSize: 50px;
 }
 
 .off-canvas {
+  display: flex;
+  align-items: stretch;
+
   position: absolute;
   width: $settingsWidth;
   left: -$settingsWidth;
@@ -348,10 +385,16 @@ $cornerSize: 50px;
   }
 
   & .settings {
+
+    overflow-x: hidden;
+    overflow-y: auto;
+    max-height: calc(100vh - ($cornerSize + 10px) * 2 - 20px);
+
     display: flex;
     flex-flow: row wrap;
     /*align-items: center;*/
-    justify-content: space-between;
+    /*justify-content: space-between;*/
+    align-content: start;
 
     margin: 1rem;
     font-size: 14px;
@@ -369,7 +412,7 @@ $cornerSize: 50px;
       height: 1px;
       border: 0;
       border-top: medium solid gray;
-      margin-bottom: 1rem;
+      margin-bottom: 0.5rem;
     }
 
     & .settings-item {
@@ -377,9 +420,9 @@ $cornerSize: 50px;
       display: flex;
       align-items: center;
 
-      margin-bottom: 1rem;
+      margin-bottom: 0.5rem;
 
-      height: 36px;
+      height: 30px;
 
       border-radius: $borderRadius;
       background-color: #fff;
@@ -562,24 +605,27 @@ input[type=range]::-moz-focus-outer {
   display: flex;
   align-items: center;
 
+  /*cursor: pointer;*/
+
   & .toggle-slider {
+    cursor: pointer;
+
     position: relative;
     margin-right: 10px;
-    width: 50px;
-    height: 30px;
+    width: 40px;
+    height: 20px;
     background: #ddd;
     transition: 0.4s;
     border-radius: 15px;
-    cursor: pointer;
   }
 
   & .toggle-slider::before {
     position: absolute;
     content: "";
-    width: 25px;
-    height: 25px;
-    left: 2.5px;
-    top: 2.5px;
+    width: 16px;
+    height: 16px;
+    left: 4px;
+    top: 2px;
     background: white;
     transition: 0.4s;
     border-radius: 50%;
@@ -595,7 +641,7 @@ input[type=range]::-moz-focus-outer {
   }
 
   & input:checked + .toggle-slider:before {
-    transform: translate(20px);
+    transform: translate(16px);
   }
 }
 
@@ -604,12 +650,13 @@ input[type=range]::-moz-focus-outer {
   align-items: center;
 
   & .settings-button {
+    cursor: pointer;
     border: 0;
     box-shadow: none;
 
     background-color: #039be5;
-    width: 50px;
-    height: 30px;
+    width: 40px;
+    height: 20px;
     border-radius: 15px;
     margin-right: 10px;
 
